@@ -1,37 +1,61 @@
 #!/usr/bin/env python3
 from uuid import uuid4
-import datetime
+from datetime import datetime
+from models import storage
 
 """
     the base model package
 """
+
 
 class BaseModel:
     """ the base model class"""
     def __init__(self, *args, **kwargs):
         if len(kwargs) == 0:
             self.id = str(uuid4())
-            self.created_at = datetime.datetime.today()
+            self.created_at = datetime.now()
             self.updated_at = self.created_at
+            storage.new(self)
         else:
-            self.id = kwargs["id"]
-            self.created_at = datetime.datetime.strptime(kwargs["created_at"], "%Y-%m-%dT%H:%M:%S.%f")
-            self.updated_at = datetime.datetime.strptime(kwargs["updated_at"], "%Y-%m-%dT%H:%M:%S.%f")
-            self.name = kwargs["name"]
-            self.my_number = kwargs["my_number"]
+            for key, value in kwargs.items():
+                if key == "id":
+                    self.id = kwargs["id"]
+                elif key == "created_at":
+                    self.created_at = datetime.strptime(value,
+                                       "%Y-%m-%dT%H:%M:%S.%f")
+            
+                elif key == "updated_at":
+                    self.updated_at = datetime.strptime(value,
+                                       "%Y-%m-%dT%H:%M:%S.%f")
+                elif key == "name":
+                    self.name = value
+                elif key == "my_number":
+                    self.my_number = value
+                elif key == "email":
+                    self.email = value
+                elif key == "first_name":
+                    self.first_name = value
 
     def __str__(self):
+        """ string representation of base model object """
         return (f"[{self.__class__.__name__}] ({self.id}) <{self.__dict__}>")
 
     def save(self):
-        self.updated_at = datetime.datetime.today()
+        """ updates the public instance
+        attribute updated_at with the current datetime"""
+        self.updated_at = datetime.now()
+        storage.save()
 
     def to_dict(self):
-        dict_repr = self.__dict__
-        dict_repr["__class__"] = self.__class__.__name__
-        dict_repr["updated_at"] = str(dict_repr["updated_at"].isoformat())
-        dict_repr["created_at"] = str(dict_repr["created_at"].isoformat())
-        return (dict_repr)
-
-if __name__ == "__main__":
-	pass
+        """ returns a dictionary containing all
+        keys/values of __dict__ of the instance """
+        dict_rep = {}
+        time_format = datetime.isoformat
+        for key in self.__dict__:
+            value = self.__dict__[key]
+            if key == "created_at" or key == "updated_at":
+                dict_rep[key] = str(time_format(value))
+            else:
+                dict_rep[key] = value
+        dict_rep["__class__"] = type(self).__name__
+        return dict_rep
