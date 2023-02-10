@@ -30,9 +30,7 @@ class HBNBCommand(cmd.Cmd):
         """"""
         if line == "":
             print("** class name missing **")
-        elif not self.is_class_exist(line): 
-            print("** class doesn't exist **")
-        else:
+        elif self.is_class_exist(line):
             if line == "BaseModel":
                 new_object = BaseModel()
             elif line == "User":
@@ -55,7 +53,27 @@ class HBNBCommand(cmd.Cmd):
         if class_name in HBNBCommand.existed_classes:
             return True
         else:
+            print("** class doesn't exist **")
             return False
+
+    def make_obj(self, name, **args):
+        """"""
+        model = object()
+        if name == "BaseModel":
+            model = BaseModel(**args)
+        elif name == "User":
+            model = User(**args)
+        elif name == "Place":
+            model = Place(**args)
+        elif name == "City":
+            model = City(**args)
+        elif name == "Amenity":
+            model = Amenity(**args)
+        elif name == "Review":
+            model = Review(**args)
+        elif name == "State":
+            model = State(**args)
+        return model
 
     def show_or_destroy(self, mth, class_name, key):
         """"""
@@ -66,39 +84,9 @@ class HBNBCommand(cmd.Cmd):
             __objects = storage.all()
             if key[1] in __objects:
                 if mth == "show":
-                    if class_name == "BaseModel":
-                        if __objects[key[1]]["__class__"] == "BaseModel":
-                            print(BaseModel(**__objects[key[1]]))
-                        else:
-                            print("** no instance found **")
-                    elif class_name == "User":
-                        if __objects[key[1]]["__class__"] == "User":
-                            print(User(**__objects[key[1]]))
-                        else:
-                            print("** no instance found **")
-                    elif class_name == "Place":
-                        if __objects[key[1]]["__class__"] == "Place":
-                            print(Place(**__objects[key[1]]))
-                        else:
-                            print("** no instance found **")
-                    elif class_name == "State":
-                        if __objects[key[1]]["__class__"] == "State":
-                            print(State(**__objects[key[1]]))
-                        else:
-                            print("** no instance found **")
-                    elif class_name == "City":
-                        if __objects[key[1]]["__class__"] == "City":
-                            print(City(**__objects[key[1]]))
-                        else:
-                            print("** no instance found **")
-                    elif class_name == "Amenity":
-                        if __objects[key[1]]["__class__"] == "Amenity":
-                            print(Amenity(**__objects[key[1]]))
-                        else:
-                            print("** no instance found **")
-                    elif class_name == "Review":
-                        if __objects[key[1]]["__class__"] == "Review":
-                            print(Review(**__objects[key[1]]))
+                    if self.is_class_exist(class_name):
+                        if __objects[key[1]]["__class__"] == class_name:
+                            print(self.make_obj(class_name, **__objects[key[1]]))
                         else:
                             print("** no instance found **")
                 else:
@@ -112,9 +100,7 @@ class HBNBCommand(cmd.Cmd):
         line_parsed = self.parse_line(line)
         if line_parsed == []:
             print("** class name missing **")
-        elif not self.is_class_exist(line_parsed[0]):
-            print("** class doesn't exist **")
-        else:
+        elif self.is_class_exist(line_parsed[0]):
             self.show_or_destroy("show" ,line_parsed[0], line_parsed)
 
     def do_destroy(self, line):
@@ -123,31 +109,15 @@ class HBNBCommand(cmd.Cmd):
         if line_parsed == []:
             print("** class name missing **")
         else:
-            if not self.is_class_exist(line_parsed[0]): 
-                print("** class doesn't exist **")
-            else:
+            if self.is_class_exist(line_parsed[0]): 
                 self.show_or_destroy("destroy", line_parsed[0], line_parsed)
 
     def do_all(self, line):
         """"""
         line_parsed = self.parse_line(line)
         if len(line_parsed) != 0:
-            if line_parsed[0] == "BaseModel":
-                self.show_all("BaseModel")
-            elif line_parsed[0] == "User":
-                self.show_all("User")
-            elif line_parsed[0] == "Place":
-                self.show_all("Place")
-            elif line_parsed[0] == "State":
-                self.show_all("State")
-            elif line_parsed[0] == "City":
-                self.show_all("City")
-            elif line_parsed[0] == "Amenity":
-                self.show_all("Amenity")
-            elif line_parsed[0] == "Review":
-                self.show_all("Review")
-            else:
-                print("** class doesn't exist **")
+            if is_class_exist(line_parsed[0]):
+                self.show_all(line_parsed[0])
         else:
             self.show_all("")
 
@@ -157,27 +127,9 @@ class HBNBCommand(cmd.Cmd):
         storage.reload()
         __objects = storage.all()
         for key, obj in __objects.items():
-            if model == "BaseModel":
-                if obj["__class__"] == "BaseModel":
-                    obj_list.append(BaseModel(**obj).__str__())
-            elif model == "User":
-                if obj["__class__"] == "User":
-                    obj_list.append(User(**obj).__str__())
-            elif model == "Place":
-                if obj["__class__"] == "Place":
-                    obj_list.append(Place(**obj).__str__())
-            elif model == "State":
-                if obj["__class__"] == "State":
-                    obj_list.append(State(**obj).__str__())
-            elif model == "City":
-                if obj["__class__"] == "City":
-                    obj_list.append(City(**obj).__str__())
-            elif model == "Amenity":
-                if obj["__class__"] == "Amenity":
-                    obj_list.append(Amenity(**obj).__str__())
-            elif model == "Review":
-                if obj["__class__"] == "Review":
-                    obj_list.append(Review(**obj).__str__())
+            if self.is_class_exist(model):
+                if obj["__class__"] == model:
+                    obj_list.append(self.make_obj(**obj).__str__())
             elif model == "":
                 if obj["__class__"] == "BaseModel":
                     obj_list.append(BaseModel(**obj).__str__())
@@ -198,20 +150,8 @@ class HBNBCommand(cmd.Cmd):
     def update(self, args, obj):
         """"""
         model = object()
-        if args[0] == "BaseModel":
-            model = BaseModel(**obj[args[1]])
-        elif args[0] == "User":
-            model = User(**obj[args[1]])
-        elif args[0] == "Place":
-            model = Place(**obj[args[1]])
-        elif args[0] == "State":
-            model = State(**obj[args[1]])
-        elif args[0] == "City":
-            model = City(**obj[args[1]])
-        elif args[0] == "Amenity":
-            model = Amenity(**obj[args[1]])
-        elif args[0] == "Review":
-            model = Review(**obj[args[1]])
+        if self.is_class_exist(args[0]):
+            model = self.make_obj(**obj[args[1]])
         return model
 
     def do_update(self, line):
@@ -219,7 +159,7 @@ class HBNBCommand(cmd.Cmd):
         line_parsed = self.parse_line(line)
         if line_parsed == []:
             print("** class name missing **")
-        elif line_parsed[0] == "BaseModel":
+        elif self.is_class_exist(line_parsed[0]):
             if len(line_parsed) == 1:
                 print("** instance id missing **")
             else:
@@ -241,9 +181,7 @@ class HBNBCommand(cmd.Cmd):
                                 storage.save()
                 else:
                     print("** no instance found **")
-        else:
-            print("** class doesn't exist **")
-
+    
     def parse_line(self, line):
         return list(filter(lambda w: (w != ''), line.split(" ")))
 
