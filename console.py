@@ -8,6 +8,7 @@ from models.city import City
 from models.amenity import Amenity
 from models.review import Review
 from models import storage
+import re
 
 """
     the console package
@@ -25,6 +26,7 @@ class HBNBCommand(cmd.Cmd):
                        "City",
                        "Amenity",
                        "Review"]
+    object_count = 0
     
     def do_create(self, line):
         """"""
@@ -117,36 +119,26 @@ class HBNBCommand(cmd.Cmd):
         """"""
         line_parsed = self.parse_line(line)
         if len(line_parsed) != 0:
-            if is_class_exist(line_parsed[0]):
+            if self.is_class_exist(line_parsed[0]):
                 self.show_all(line_parsed[0])
         else:
             self.show_all("")
 
-    def show_all(self, model):
+    def show_all(self, model, show=True):
         """"""
         obj_list = []
         storage.reload()
         __objects = storage.all()
+        HBNBCommand.object_count = 0
         for key, obj in __objects.items():
             if self.is_class_exist(model, False):
                 if obj["__class__"] == model:
-                    obj_list.append(self.make_obj(**obj).__str__())
+                    obj_list.append(self.make_obj(model, **obj).__str__())
+                    HBNBCommand.object_count += 1
             elif model == "":
-                if obj["__class__"] == "BaseModel":
-                    obj_list.append(BaseModel(**obj).__str__())
-                elif obj["__class__"] == "User":
-                    obj_list.append(User(**obj).__str__())
-                elif obj["__class__"] == "Place":
-                    obj_list.append(Place(**obj).__str__())
-                elif obj["__class__"] == "State":
-                    obj_list.append(State(**obj).__str__())
-                elif obj["__class__"] == "City":
-                    obj_list.append(City(**obj).__str__())
-                elif obj["__class__"] == "Amenity":
-                    obj_list.append(Amenity(**obj).__str__())
-                elif obj["__class__"] == "Review":
-                    obj_list.append(Review(**obj).__str__())
-        print(obj_list)
+                obj_list.append(self.make_obj(obj["__class__"], **obj).__str__())
+        if show:
+            print(obj_list)
 
     def update(self, args, obj):
         """"""
@@ -183,8 +175,46 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     print("** no instance found **")
     
-    def parse_line(self, line):
-        return list(filter(lambda w: (w != ''), line.split(" ")))
+    def parse_line(self, line, char=" "):
+        return list(filter(lambda w: (w != ''), line.split(char)))
+
+    def precmd(self, line):
+        line = line.strip()
+        line_parsed = self.parse_line(line, ".")
+        if len(line_parsed) == 2:
+            if len(line_parsed[0]) != 0:
+                if line_parsed[1] == "all()":
+                    if self.is_class_exist(line_parsed[0]):
+                        self.do_all(line_parsed[0])
+                elif line_parsed[1] == "count()":
+                    if self.is_class_exist(line_parsed[0]):
+                        self.show_all(line_parsed[0], False)
+                        print(HBNBCommand.object_count)
+                elif re.search("^show\([\w-]*\)$", line_parsed[1]):
+                    if self.is_class_exist(line_parsed[0]):
+                        _id = self.parse_line(line_parsed[1], "(")[1]
+                        _id = self.parse_line(_id, ")")[0]
+                        self.do_show(f"{line_parsed[0]} {_id}")
+                elif re.search("^destroy\([\w-]*\)$", line_parsed[1]):
+                    if self.is_class_exist(line_parsed[0]):
+                        _id = self.parse_line(line_parsed[1], "(")[1]
+                        _id = self.parse_line(_id, ")")[0]
+                        self.do_destroy(f"{line_parsed[0]} {_id}")
+                elif re.search("^update\( *[\w-]* *, *[\w_-]* *, *.* *\)$", line_parsed[1]):
+                    if self.is_class_exist(line_parsed[0]):
+                        _id = self.parse_line(line_parsed[1], "(")[1]
+                        __ = self.parse_line(_id, ",")
+                        _id = __[0].strip()
+                        _attr_name = __[1].strip()
+                        _value = self.parse_line(__[2], ")")[0].strip()
+                        self.do_update(f"{line_parsed[0]} {_id} {_attr_name} {_value}")
+                else:
+                    return line
+            else:
+                return line
+        else:
+            return line
+        return ""
 
     def emptyline(self):
         """"""
