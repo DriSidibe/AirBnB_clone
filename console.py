@@ -208,6 +208,9 @@ class HBNBCommand(cmd.Cmd):
                         _attr_name = __[1].strip()
                         _value = self.parse_line(__[2], ")")[0].strip()
                         self.do_update(f"{line_parsed[0]} {_id} {_attr_name} {_value}")
+                elif re.search("^update\( *[\w-]* *, *{ *(\w *: *.* * *, *)* *} *\)$", line_parsed[1]):
+                    if self.is_class_exist(line_parsed[0]):
+                        pass
                 else:
                     return line
             else:
