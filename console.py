@@ -48,12 +48,13 @@ class HBNBCommand(cmd.Cmd):
             new_object.save()
             print(new_object.id)
 
-    def is_class_exist(self, class_name):
+    def is_class_exist(self, class_name, show=True):
         """"""
         if class_name in HBNBCommand.existed_classes:
             return True
         else:
-            print("** class doesn't exist **")
+            if show:
+                print("** class doesn't exist **")
             return False
 
     def make_obj(self, name, **args):
@@ -127,7 +128,7 @@ class HBNBCommand(cmd.Cmd):
         storage.reload()
         __objects = storage.all()
         for key, obj in __objects.items():
-            if self.is_class_exist(model):
+            if self.is_class_exist(model, False):
                 if obj["__class__"] == model:
                     obj_list.append(self.make_obj(**obj).__str__())
             elif model == "":
@@ -151,7 +152,7 @@ class HBNBCommand(cmd.Cmd):
         """"""
         model = object()
         if self.is_class_exist(args[0]):
-            model = self.make_obj(**obj[args[1]])
+            model = self.make_obj(args[0], **obj[args[1]])
         return model
 
     def do_update(self, line):
