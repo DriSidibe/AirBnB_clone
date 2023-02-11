@@ -23,14 +23,19 @@ class FileStorage:
 
     def new(self, obj):
         """"""
-        FileStorage.__objects[obj.id] = obj.to_dict()
+        _id = obj.__class__.__name__ + "." + obj.id
+        FileStorage.__objects[_id] = obj
 
     def save(self):
         """"""
+        json_form = {}
+        for k, v in FileStorage.__objects.items():
+            json_form[k] = v.to_dict()
         with open(FileStorage.__file_path, "w") as fp:
-            json.dump(FileStorage.__objects, fp)
+            json.dump(json_form, fp)
 
     def delete(self, class_name, id_model):
+        id_model = class_name + "." + id_model
         if FileStorage.__objects[id_model]["__class__"] == class_name:
             del FileStorage.__objects[id_model]
         else:

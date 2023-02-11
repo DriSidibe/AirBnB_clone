@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 """ Contains unittests for City class """
+import sys
+sys.path.append("..")
 import unittest
 import os
 from models.base_model import BaseModel
@@ -28,3 +30,6 @@ class TestCityClass(unittest.TestCase):
         self.assertEqual(City.state_id, "")
         self.assertEqual(obj.name, "")
         self.assertEqual(obj.state_id, "")
+
+if __name__ == "__main__":
+        unittest.main()

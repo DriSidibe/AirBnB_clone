@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 """ Contains unittests for FileStorage class """
+import sys
+sys.path.append("..")
 import unittest
 import os
 from models import storage
@@ -21,6 +23,8 @@ class TestFileStorageClass(unittest.TestCase):
         key = "{}.{}".format(type(obj).__name__, obj.id)
         self.assertIn(key, __objects)
         # test that the value in dictionary is of same type and equal to obj
+        print(obj, "\n")
+        print(__objects[key])
         self.assertEqual(obj, __objects[key])
         self.assertIsInstance(__objects[key], BaseModel)
 
@@ -91,3 +95,6 @@ class TestFileStorageClass(unittest.TestCase):
         # Reload
         storage.reload()
         self.assertEqual(storage.all().keys(), obje_dict.keys())
+
+if __name__ == "__main__":
+        unittest.main()
