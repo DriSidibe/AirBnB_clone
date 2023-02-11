@@ -30,6 +30,7 @@ class FileStorage:
         """"""
         json_form = {}
         for k, v in FileStorage.__objects.items():
+            print
             json_form[k] = v.to_dict()
         with open(FileStorage.__file_path, "w") as fp:
             json.dump(json_form, fp)
