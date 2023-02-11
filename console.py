@@ -9,6 +9,7 @@ from models.amenity import Amenity
 from models.review import Review
 from models import storage
 import re
+from os import system, name
 
 """
     the console package
@@ -147,6 +148,9 @@ class HBNBCommand(cmd.Cmd):
             model = self.make_obj(args[0], **obj[args[1]])
         return model
 
+    def do_clear(self, line):
+        system('cls' if name=='nt' else 'clear')
+
     def do_update(self, line):
         """"""
         line_parsed = self.parse_line(line)
@@ -178,9 +182,16 @@ class HBNBCommand(cmd.Cmd):
     def parse_line(self, line, char=" "):
         return list(filter(lambda w: (w != ''), line.split(char)))
 
+    def w_out(self, s):
+        if s[0] == "\"":
+            return s[1:len(s)-1]
+
     def precmd(self, line):
         line = line.strip()
         line_parsed = self.parse_line(line, ".")
+        exp_show = "\(\"[\w-]*\"\)"
+        e_upd_1 = "\( *\"[\w-]*\" *, *\"[\w_-]*\" *, *((.*)|(\".*\"))* *\)"
+        #e_upd_2 = "\( *[\"\w-]*\" *, *{ *(\"[a-zA-Z0-9_-]*\" *: *((.*)|(\".*\"))* *,? *)+ *} *\)" 
         if len(line_parsed) == 2:
             if len(line_parsed[0]) != 0:
                 if line_parsed[1] == "all()":
@@ -190,25 +201,23 @@ class HBNBCommand(cmd.Cmd):
                     if self.is_class_exist(line_parsed[0]):
                         self.show_all(line_parsed[0], False)
                         print(HBNBCommand.object_count)
-                elif re.search("^show\([\w-]*\)$", line_parsed[1]):
+                elif re.search(f"^((show)|(destroy)){exp_show}$", line_parsed[1]):
                     if self.is_class_exist(line_parsed[0]):
-                        _id = self.parse_line(line_parsed[1], "(")[1]
+                        res = self.parse_line(line_parsed[1], "(")
+                        _id = res[1]
                         _id = self.parse_line(_id, ")")[0]
-                        self.do_show(f"{line_parsed[0]} {_id}")
-                elif re.search("^destroy\([\w-]*\)$", line_parsed[1]):
-                    if self.is_class_exist(line_parsed[0]):
-                        _id = self.parse_line(line_parsed[1], "(")[1]
-                        _id = self.parse_line(_id, ")")[0]
-                        self.do_destroy(f"{line_parsed[0]} {_id}")
-                elif re.search("^update\( *[\w-]* *, *[\w_-]* *, *.* *\)$", line_parsed[1]):
+                        _id = _id[1:len(_id)-1]
+                        fun = getattr(self, f"do_{res[0]}")
+                        fun(f"{line_parsed[0]} {_id}")
+                elif re.search(f"^update{e_upd_1}$", line_parsed[1]):
                     if self.is_class_exist(line_parsed[0]):
                         _id = self.parse_line(line_parsed[1], "(")[1]
                         __ = self.parse_line(_id, ",")
-                        _id = __[0].strip()
-                        _attr_name = __[1].strip()
-                        _value = self.parse_line(__[2], ")")[0].strip()
+                        _id = self.w_out(__[0].strip())
+                        _attr_name = self.w_out(__[1].strip())
+                        _value = self.w_out(self.parse_line(__[2], ")")[0].strip())
                         self.do_update(f"{line_parsed[0]} {_id} {_attr_name} {_value}")
-                elif re.search("^update\( *[\w-]* *, *{ *(\w *: *.* * *, *)* *} *\)$", line_parsed[1]):
+                elif re.search(f"^update{e_upd_2}$", line_parsed[1]):
                     if self.is_class_exist(line_parsed[0]):
                         pass
                 else:

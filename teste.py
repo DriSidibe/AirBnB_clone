@@ -1,3 +1,9 @@
-import models
+class Test:
+    def say_hi(self):
+        print("hi")
 
-print(dir(models))
+test = Test()
+
+fun = getattr(test, "say_hi")
+
+fun()

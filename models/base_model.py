@@ -17,16 +17,14 @@ class BaseModel:
             self.updated_at = self.created_at
             storage.new(self)
         else:
+            iso_format = "%Y-%m-%dT%H:%M:%S.%f"
             for key, value in kwargs.items():
                 if key == "id":
                     self.id = kwargs["id"]
                 elif key == "created_at":
-                    self.created_at = datetime.strptime(value,
-                                       "%Y-%m-%dT%H:%M:%S.%f")
-            
+                    self.created_at = datetime.strptime(value, iso_format)
                 elif key == "updated_at":
-                    self.updated_at = datetime.strptime(value,
-                                       "%Y-%m-%dT%H:%M:%S.%f")
+                    self.updated_at = datetime.strptime(value, iso_format)
                 elif key == "name":
                     self.name = value
                 elif key == "my_number":
