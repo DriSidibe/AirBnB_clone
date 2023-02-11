@@ -27,8 +27,9 @@ class HBNBCommand(cmd.Cmd):
                        "City",
                        "Amenity",
                        "Review"]
+    unmodifiable_attr = ["id", "updated_at", "created_at"]
     object_count = 0
-    
+
     def do_create(self, line):
         """"""
         if line == "":
@@ -37,17 +38,17 @@ class HBNBCommand(cmd.Cmd):
             if line == "BaseModel":
                 new_object = BaseModel()
             elif line == "User":
-                new_object = User()    
+                new_object = User()
             elif line == "Place":
-                new_object = Place()    
+                new_object = Place()
             elif line == "State":
-                new_object = State()    
+                new_object = State()
             elif line == "City":
-                new_object = City()    
+                new_object = City()
             elif line == "Amenity":
-                new_object = Amenity()    
+                new_object = Amenity()
             elif line == "Review":
-                new_object = Review()    
+                new_object = Review()
             new_object.save()
             print(new_object.id)
 
@@ -79,7 +80,7 @@ class HBNBCommand(cmd.Cmd):
             model = State(**args)
         return model
 
-    def show_or_destroy(self, mth, class_name, key):
+    def show_or_destroy(self, mth, name, key):
         """"""
         if len(key) == 1:
             print("** instance id missing **")
@@ -88,13 +89,13 @@ class HBNBCommand(cmd.Cmd):
             __objects = storage.all()
             if key[1] in __objects:
                 if mth == "show":
-                    if self.is_class_exist(class_name):
-                        if __objects[key[1]]["__class__"] == class_name:
-                            print(self.make_obj(class_name, **__objects[key[1]]))
+                    if self.is_class_exist(name):
+                        if __objects[key[1]]["__class__"] == name:
+                            print(self.make_obj(name, **__objects[key[1]]))
                         else:
                             print("** no instance found **")
                 else:
-                    storage.delete(class_name, key[1])
+                    storage.delete(name, key[1])
                     storage.save()
             else:
                 print("** no instance found **")
@@ -105,7 +106,7 @@ class HBNBCommand(cmd.Cmd):
         if line_parsed == []:
             print("** class name missing **")
         elif self.is_class_exist(line_parsed[0]):
-            self.show_or_destroy("show" ,line_parsed[0], line_parsed)
+            self.show_or_destroy("show", line_parsed[0], line_parsed)
 
     def do_destroy(self, line):
         """"""
@@ -113,7 +114,7 @@ class HBNBCommand(cmd.Cmd):
         if line_parsed == []:
             print("** class name missing **")
         else:
-            if self.is_class_exist(line_parsed[0]): 
+            if self.is_class_exist(line_parsed[0]):
                 self.show_or_destroy("destroy", line_parsed[0], line_parsed)
 
     def do_all(self, line):
@@ -137,7 +138,8 @@ class HBNBCommand(cmd.Cmd):
                     obj_list.append(self.make_obj(model, **obj).__str__())
                     HBNBCommand.object_count += 1
             elif model == "":
-                obj_list.append(self.make_obj(obj["__class__"], **obj).__str__())
+                _ = self.make_obj(obj["__class__"], **obj).__str__()
+                obj_list.append(_)
         if show:
             print(obj_list)
 
@@ -149,7 +151,7 @@ class HBNBCommand(cmd.Cmd):
         return model
 
     def do_clear(self, line):
-        system('cls' if name=='nt' else 'clear')
+        system('cls' if name == 'nt' else 'clear')
 
     def do_update(self, line):
         """"""
@@ -169,16 +171,17 @@ class HBNBCommand(cmd.Cmd):
                         if len(line_parsed) == 3:
                             print("** value missing **")
                         else:
-                            if line_parsed[2] in ["id", "updated_at", "created_at"]:
+                            if line_parsed[2] in unmodifiable_attr:
                                 pass
                             else:
-                                __objects[line_parsed[1]][line_parsed[2]] = line_parsed[3].strip("\"")
+                                _ = line_parsed[3].strip("\"")
+                                __objects[line_parsed[1]][line_parsed[2]] = _
                                 new_model = self.update(line_parsed, __objects)
                                 storage.new(new_model)
                                 storage.save()
                 else:
                     print("** no instance found **")
-    
+
     def parse_line(self, line, char=" "):
         return list(filter(lambda w: (w != ''), line.split(char)))
 
@@ -189,9 +192,11 @@ class HBNBCommand(cmd.Cmd):
     def precmd(self, line):
         line = line.strip()
         line_parsed = self.parse_line(line, ".")
-        exp_show = "\(\"[\w-]*\"\)"
-        e_upd_1 = "\( *\"[\w-]*\" *, *\"[\w_-]*\" *, *((.*)|(\".*\"))* *\)"
-        #e_upd_2 = "\( *[\"\w-]*\" *, *{ *(\"[a-zA-Z0-9_-]*\" *: *((.*)|(\".*\"))* *,? *)+ *} *\)" 
+        exp_show = r"^((show)|(destroy))\(\"[\w-]*\"\)$"
+        e_upd_1 = r"\( *\"[\w-]*\" *, *\"[\w_-]*\" *, *((.*)|(\".*\"))* *\)"
+        # e_upd_2 =
+        # "\( *[\"\w-]*\" *, *{ *(\"[a-zA-Z0-9_-]*\" *
+        # : *((.*)|(\".*\"))* *,? *)+ *} *\)"
         if len(line_parsed) == 2:
             if len(line_parsed[0]) != 0:
                 if line_parsed[1] == "all()":
@@ -201,7 +206,7 @@ class HBNBCommand(cmd.Cmd):
                     if self.is_class_exist(line_parsed[0]):
                         self.show_all(line_parsed[0], False)
                         print(HBNBCommand.object_count)
-                elif re.search(f"^((show)|(destroy)){exp_show}$", line_parsed[1]):
+                elif re.search(exp_show, line_parsed[1]):
                     if self.is_class_exist(line_parsed[0]):
                         res = self.parse_line(line_parsed[1], "(")
                         _id = res[1]
@@ -215,8 +220,10 @@ class HBNBCommand(cmd.Cmd):
                         __ = self.parse_line(_id, ",")
                         _id = self.w_out(__[0].strip())
                         _attr_name = self.w_out(__[1].strip())
-                        _value = self.w_out(self.parse_line(__[2], ")")[0].strip())
-                        self.do_update(f"{line_parsed[0]} {_id} {_attr_name} {_value}")
+                        _ = self.parse_line(__[2], ")")[0].strip()
+                        _value = self.w_out(_)
+                        __ = f"{line_parsed[0]} {_id} {_attr_name} {_value}"
+                        self.do_update(__)
                 elif re.search(f"^update{e_upd_2}$", line_parsed[1]):
                     if self.is_class_exist(line_parsed[0]):
                         pass
@@ -242,7 +249,8 @@ class HBNBCommand(cmd.Cmd):
 
     def help_update(self):
         """"""
-        print("update <class name> <id> <attribute name> \"<attribute value>\"")
+        _ = "update <class name> <id> <attribute name> \"<attribute value>\""
+        print(_)
 
     def help_quit(self):
         """"""
