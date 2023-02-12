@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """ Contains unittests for BaseModel class """
-import sys
-sys.path.append("..")
 import unittest
 import os
 from models.base_model import BaseModel
@@ -102,5 +100,6 @@ class TestBaseModelClass(unittest.TestCase):
         # check that new object is a different instance
         self.assertIsNot(obj, obj2)
 
+
 if __name__ == "__main__":
-	unittest.main()
+    unittest.main()

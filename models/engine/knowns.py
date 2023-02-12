@@ -7,10 +7,10 @@ from ..city import City
 from ..amenity import Amenity
 from ..review import Review
 
-knowns_obj = {"BaseModel" : BaseModel,
-              "User" : User,
-              "Place" : Place,
-              "State" : State,
-              "City" : City,
-              "Amenity" : Amenity,
-              "Review" : Review}
+knowns_obj = {"BaseModel": BaseModel,
+              "User": User,
+              "Place": Place,
+              "State": State,
+              "City": City,
+              "Amenity": Amenity,
+              "Review": Review}

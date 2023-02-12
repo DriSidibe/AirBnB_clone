@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 """ Contains unittests for Amenity class """
-import sys
-sys.path.append("..")
 import unittest
 import os
 from models.base_model import BaseModel
-from models.amenity import Amenity
+from models.amenity import amenity
 
 
 class TestAmenityClass(unittest.TestCase):
@@ -28,5 +26,6 @@ class TestAmenityClass(unittest.TestCase):
         self.assertEqual(Amenity.name, "")
         self.assertEqual(obj.name, "")
 
+
 if __name__ == "__main__":
-        unittest.main()
+    unittest.main()

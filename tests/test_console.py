@@ -14,3 +14,7 @@ class TestHBNBCommandClass(TestCase):
         with patch('sys.stdout', new=StringIO()) as f:
             HBNBCommand().onecmd("create bad")
             self.assertEqual(f.getvalue(), "** class doesn't exist **\n")
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """ Contains unittests for Place class """
-import sys
-sys.path.append("..")
 import unittest
 import os
 from models.base_model import BaseModel
@@ -58,5 +56,6 @@ class TestPlaceClass(unittest.TestCase):
         self.assertEqual(obj.longitude, 0.0)
         self.assertEqual(obj.amenity_ids, [])
 
+
 if __name__ == "__main__":
-        unittest.main()
+    unittest.main()

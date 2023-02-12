@@ -58,9 +58,5 @@ class FileStorage:
             FileStorage.__objects[k] = model
 
 
-    def reinit(self):
-        FileStorage.__objects = {}
-        FileStorage.__json_form = {}
-
 if __name__ == "__main__":
     pass

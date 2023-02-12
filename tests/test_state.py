@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """ Contains unittests for State class """
-import sys
-sys.path.append("..")
 import unittest
 import os
 from models.base_model import BaseModel
@@ -28,5 +26,6 @@ class TestStateClass(unittest.TestCase):
         self.assertEqual(State.name, "")
         self.assertEqual(obj.name, "")
 
+
 if __name__ == "__main__":
-        unittest.main()
+    unittest.main()

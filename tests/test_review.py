@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """ Contains unittests for Review class """
-import sys
-sys.path.append("..")
 import unittest
 import os
 from models.base_model import BaseModel
@@ -34,5 +32,6 @@ class TestReviewClass(unittest.TestCase):
         self.assertEqual(obj.user_id, "")
         self.assertEqual(obj.text, "")
 
+
 if __name__ == "__main__":
-        unittest.main()
+    unittest.main()

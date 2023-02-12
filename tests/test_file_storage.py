@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """ Contains unittests for FileStorage class """
-import sys
-sys.path.append("..")
 import unittest
 import os
 from models import storage
@@ -36,7 +34,8 @@ class TestFileStorageClass(unittest.TestCase):
         new_dict["id"] = "012345"
         new_dict["created_at"] = "1995-2-2T10:23:35.123450"
         new_dict["updated_at"] = "1999-1-4T7:15:05.543210"
-        # create instance with **kwargs and test that object is not in __objects
+        # create instance with **kwargs
+        # and test that object is not in __objects
         obj2 = BaseModel(**new_dict)
         key = "{}.{}".format(type(obj2).__name__, obj2.id)
         self.assertNotIn(key, storage.all())
@@ -95,5 +94,6 @@ class TestFileStorageClass(unittest.TestCase):
         storage.reload()
         self.assertEqual(storage.all().keys(), obje_dict.keys())
 
+
 if __name__ == "__main__":
-        unittest.main()
+    unittest.main()

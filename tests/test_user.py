@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """ Contains unittests for User class """
-import sys
-sys.path.append("..")
 import unittest
 import os
 from models.base_model import BaseModel
@@ -37,5 +35,6 @@ class TestUserClass(unittest.TestCase):
         self.assertEqual(obj.first_name, "")
         self.assertEqual(obj.last_name, "")
 
+
 if __name__ == "__main__":
-        unittest.main()
+    unittest.main()
