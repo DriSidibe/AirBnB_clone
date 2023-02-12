@@ -22,9 +22,8 @@ class TestFileStorageClass(unittest.TestCase):
         # test that BaseModel instance in dictionary of objects
         key = "{}.{}".format(type(obj).__name__, obj.id)
         self.assertIn(key, __objects)
+
         # test that the value in dictionary is of same type and equal to obj
-        print(obj, "\n")
-        print(__objects[key])
         self.assertEqual(obj, __objects[key])
         self.assertIsInstance(__objects[key], BaseModel)
 
@@ -72,7 +71,7 @@ class TestFileStorageClass(unittest.TestCase):
     def test_reload(self):
         """ Tests reload method """
 
-        from json import dumps
+        from json import dump
 
         # Check if reloading without doing anything reloads the same thing
         old_dict = storage.all()
@@ -90,7 +89,7 @@ class TestFileStorageClass(unittest.TestCase):
         if os.path.exists("file.json"):
             os.remove("file.json")
         with open("file.json", 'w') as f:
-            f.write(dumps(dict_dict))
+            dump(dict_dict, f)
 
         # Reload
         storage.reload()

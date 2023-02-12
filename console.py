@@ -9,6 +9,7 @@ from models.amenity import Amenity
 from models.review import Review
 from models import storage
 import re
+from models.engine.knowns import knowns_obj
 from os import system, name
 
 """
@@ -20,13 +21,7 @@ class HBNBCommand(cmd.Cmd):
     """ the cnsole main class """
 
     prompt = '(hbnb) '
-    existed_classes = ["BaseModel",
-                       "User",
-                       "Place",
-                       "State",
-                       "City",
-                       "Amenity",
-                       "Review"]
+    existed_classes = list(knowns_obj.keys())
     const_atr = ["id", "updated_at", "created_at"]
     object_count = 0
 
@@ -35,20 +30,7 @@ class HBNBCommand(cmd.Cmd):
         if line == "":
             print("** class name missing **")
         elif self.is_class_exist(line):
-            if line == "BaseModel":
-                new_object = BaseModel()
-            elif line == "User":
-                new_object = User()
-            elif line == "Place":
-                new_object = Place()
-            elif line == "State":
-                new_object = State()
-            elif line == "City":
-                new_object = City()
-            elif line == "Amenity":
-                new_object = Amenity()
-            elif line == "Review":
-                new_object = Review()
+            new_object = knowns_obj[line]()
             new_object.save()
             print(new_object.id)
 
@@ -63,22 +45,14 @@ class HBNBCommand(cmd.Cmd):
 
     def make_obj(self, name, **args):
         """"""
-        model = object()
-        if name == "BaseModel":
-            model = BaseModel(**args)
-        elif name == "User":
-            model = User(**args)
-        elif name == "Place":
-            model = Place(**args)
-        elif name == "City":
-            model = City(**args)
-        elif name == "Amenity":
-            model = Amenity(**args)
-        elif name == "Review":
-            model = Review(**args)
-        elif name == "State":
-            model = State(**args)
+        model = knowns_obj[name](**args)
         return model
+
+    def obj_to_dict(self, obj):
+        dic = {}
+        for k, v in obj.items():
+            dic[k] = v.to_dict()
+        return dic
 
     def show_or_destroy(self, mth, name, key):
         """"""
@@ -86,7 +60,8 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
         else:
             storage.reload()
-            __objects = storage.all()
+            _objects = storage.all()
+            __objects = self.obj_to_dict(_objects)
             _k = name + "." + key[1]
             if _k in __objects:
                 if mth == "show":
@@ -131,7 +106,8 @@ class HBNBCommand(cmd.Cmd):
         """"""
         obj_list = []
         storage.reload()
-        __objects = storage.all()
+        _objects = storage.all()
+        __objects = self.obj_to_dict(_objects)
         HBNBCommand.object_count = 0
         for key, obj in __objects.items():
             if self.is_class_exist(model, False):
@@ -165,7 +141,8 @@ class HBNBCommand(cmd.Cmd):
                 print("** instance id missing **")
             else:
                 storage.reload()
-                __objects = storage.all()
+                _objects = storage.all()
+                __objects = self.obj_to_dict(_objects)
                 _k = line_parsed[0] + "." + line_parsed[1]
                 if _k in __objects:
                     if len(line_parsed) == 2:

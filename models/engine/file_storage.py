@@ -13,6 +13,7 @@ class FileStorage:
 
     __file_path = "file.json"
     __objects = {}
+    __json_form = {}
 
     def __init__(self, *args, **kwargs):
         pass
@@ -25,20 +26,18 @@ class FileStorage:
         """"""
         _id = obj.__class__.__name__ + "." + obj.id
         FileStorage.__objects[_id] = obj
+        FileStorage.__json_form[_id] = obj.to_dict()
 
     def save(self):
         """"""
-        json_form = {}
-        for k, v in FileStorage.__objects.items():
-            print
-            json_form[k] = v.to_dict()
         with open(FileStorage.__file_path, "w") as fp:
-            json.dump(json_form, fp)
+            json.dump(FileStorage.__json_form, fp)
 
     def delete(self, class_name, id_model):
         id_model = class_name + "." + id_model
-        if FileStorage.__objects[id_model]["__class__"] == class_name:
+        if type(FileStorage.__objects[id_model]).__name__ == class_name:
             del FileStorage.__objects[id_model]
+            del FileStorage.__json_form[id_model]
         else:
             print("** object not found **")
 
@@ -47,10 +46,21 @@ class FileStorage:
         if os.path.isfile(FileStorage.__file_path):
             if os.path.getsize(FileStorage.__file_path) > 1:
                 with open(FileStorage.__file_path) as fp:
-                    FileStorage.__objects = json.load(fp)
+                    FileStorage.__json_form = json.load(fp)
             else:
                 FileStorage.__objects = {}
+        from .knowns import knowns_obj
+        FileStorage.__objects = {}
+        for k, v in FileStorage.__json_form.items():
+            model = object()
+            name = k.split(".")[0]
+            model = knowns_obj[name](**v)
+            FileStorage.__objects[k] = model
 
+
+    def reinit(self):
+        FileStorage.__objects = {}
+        FileStorage.__json_form = {}
 
 if __name__ == "__main__":
     pass
