@@ -48,11 +48,10 @@ class BaseModel:
         """ returns a dictionary containing all
         keys/values of __dict__ of the instance """
         dict_rep = {}
-        time_format = datetime.isoformat
         for key in self.__dict__:
             value = self.__dict__[key]
             if key == "created_at" or key == "updated_at":
-                dict_rep[key] = str(time_format(value))
+                dict_rep[key] = str(value.isoformat())
             else:
                 dict_rep[key] = value
         dict_rep["__class__"] = type(self).__name__
