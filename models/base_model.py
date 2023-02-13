@@ -21,19 +21,12 @@ class BaseModel:
             for key, value in kwargs.items():
                 if key == "id":
                     self.id = kwargs["id"]
-                elif key == "created_at":
-                    self.created_at = datetime.strptime(value, iso_format)
-                elif key == "updated_at":
-                    self.updated_at = datetime.strptime(value, iso_format)
-                elif key == "name":
-                    self.name = value
-                elif key == "my_number":
-                    self.my_number = value
-                elif key == "email":
-                    self.email = value
-                elif key == "first_name":
-                    self.first_name = value
-
+                elif key == "created_at" or key == "updated_at":
+                    value = datetime.strptime(value, iso_format)
+                    setattr(self, key, value)
+                elif key != "__class__":
+                    setattr(self, key, value)
+    
     def __str__(self):
         """ string representation of base model object """
         return (f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}")

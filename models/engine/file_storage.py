@@ -30,6 +30,8 @@ class FileStorage:
 
     def save(self):
         """"""
+        for k, v in FileStorage.__objects.items():
+            FileStorage.__json_form[k] = v.to_dict()
         with open(FileStorage.__file_path, "w") as fp:
             json.dump(FileStorage.__json_form, fp)
 
