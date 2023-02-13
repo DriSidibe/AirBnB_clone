@@ -3,7 +3,7 @@
 import unittest
 import os
 from models.base_model import BaseModel
-from models.amenity import amenity
+from models.amenity import Amenity
 
 
 class TestAmenityClass(unittest.TestCase):
