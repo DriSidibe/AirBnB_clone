@@ -83,3 +83,54 @@
     width: 50px;
     background: url("../images/icon_bath.png") no-repeat center;
 }
+
+.amenities {
+	width: 100%;
+	padding: 0px;
+}
+
+.amenities li{
+	margin: 0;
+}
+
+.reviews, .amenities {
+	margin-top: 40px;
+	padding-bottom: 10px;
+}
+
+.reviews h2, .amenities h2 {
+	font-size: 16px;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+.reviews li p {
+	padding-bottom: 10px;
+}
+
+ul {
+	list-style-type: none;
+}
+
+.amenities li {
+	display: flex;
+}
+
+.icon_pet {
+	width: 50px;
+	height: 50px;
+	background: url("../images/icon_pets.png") no-repeat center;
+}
+
+.icon_tv {
+	width: 50px;
+	height: 50px;
+	background: url("../images/icon_tv.png") no-repeat center;
+}
+
+.icon_wifi {
+	width: 50px;
+	height: 50px;
+	background: url("../images/icon_wifi.png") no-repeat center;
+}
+
+
