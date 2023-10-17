@@ -11,7 +11,7 @@ import os
 class FileStorage:
     """ the file_storage class"""
 
-    __file_path = "file.json"
+    __file_path = "./file.json"
     __objects = {}
     __json_form = {}
 
@@ -48,10 +48,16 @@ class FileStorage:
         if os.path.isfile(FileStorage.__file_path):
             if os.path.getsize(FileStorage.__file_path) > 1:
                 with open(FileStorage.__file_path) as fp:
-                    FileStorage.__objects = json.load(fp)
                     FileStorage.__json_form = json.load(fp)
             else:
                 FileStorage.__objects = {}
+        from .knowns import knowns_obj
+        FileStorage.__objects = {}
+        for k, v in FileStorage.__json_form.items():
+            model = object()
+            name = k.split(".")[0]
+            model = knowns_obj[name](**v)
+            FileStorage.__objects[k] = model
 
 
 if __name__ == "__main__":
