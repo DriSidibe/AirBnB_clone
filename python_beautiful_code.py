@@ -1,6 +1,6 @@
 def say_hello():
     """
-        this function say hello
+        This function say hello
     """
     print("hello")
 
